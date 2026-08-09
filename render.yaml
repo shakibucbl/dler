@@ -1,41 +1,11 @@
 services:
-  - type: redis
-    name: dler-redis
-    plan: free
-    maxmemoryPolicy: noeviction
-    # No ipAllowList needed for redis
-
-  - type: worker
-    name: dler-worker
-    env: docker
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    dockerCommand: celery -A app.celery worker --loglevel=info
-    # ipAllowList removed - not allowed for worker type
-    envVars:
-      - key: REDIS_URL
-        fromService:
-          name: dler-redis
-          type: redis
-          property: connectionString
-      - key: PYTHONUNBUFFERED
-        value: "1"
-
   - type: web
     name: dler-web
     env: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
     dockerCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
-    ipAllowList:
-      - source: 0.0.0.0/0
-        description: Allow all traffic (for public access)
     envVars:
       - key: REDIS_URL
-        fromService:
-          name: dler-redis
-          type: redis
-          property: connectionString
-      - key: PYTHONUNBUFFERED
-        value: "1"
+        value: redis://localhost:6379
     healthCheckPath: /docs
