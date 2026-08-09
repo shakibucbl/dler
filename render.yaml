@@ -1,14 +1,12 @@
 services:
-  # Redis - message broker for Celery
   - type: redis
     name: dler-redis
     plan: free
     maxmemoryPolicy: noeviction
     ipAllowList:
       - source: 0.0.0.0/0
-        description: Allow all traffic (for testing)
+        description: Allow all traffic
 
-  # Celery worker - handles background downloads
   - type: worker
     name: dler-worker
     env: docker
@@ -27,7 +25,6 @@ services:
       - key: PYTHONUNBUFFERED
         value: "1"
 
-  # FastAPI web server - serves the UI and API
   - type: web
     name: dler-web
     env: docker
