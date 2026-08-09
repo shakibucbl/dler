@@ -3,9 +3,7 @@ services:
     name: dler-redis
     plan: free
     maxmemoryPolicy: noeviction
-    ipAllowList:
-      - source: 0.0.0.0/0
-        description: Allow all traffic
+    # No ipAllowList needed for redis
 
   - type: worker
     name: dler-worker
@@ -13,9 +11,7 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     dockerCommand: celery -A app.celery worker --loglevel=info
-    ipAllowList:
-      - source: 0.0.0.0/0
-        description: Allow all traffic
+    # ipAllowList removed - not allowed for worker type
     envVars:
       - key: REDIS_URL
         fromService:
@@ -33,7 +29,7 @@ services:
     dockerCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
     ipAllowList:
       - source: 0.0.0.0/0
-        description: Allow all traffic
+        description: Allow all traffic (for public access)
     envVars:
       - key: REDIS_URL
         fromService:
